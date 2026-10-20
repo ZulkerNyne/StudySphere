@@ -1,12 +1,13 @@
 from flask import Blueprint, request, jsonify
 from studysphere.app import db
-from studysphere.models import Student
+from studysphere.models import Student, Enrollment
 from studysphere.services.auth_service import (
     hash_password,
     verify_password,
     create_token,
     create_refresh_token,
     decode_token,
+    login_required,
 )
 from jose import JWTError
 
@@ -56,6 +57,30 @@ def login():
         "access_token": create_token(student.student_id),
         "refresh_token": create_refresh_token(student.student_id),
         "student_id": student.student_id,
+    })
+
+
+@auth_bp.route("/profile", methods=["GET"])
+@login_required
+def profile():
+    student = db.session.get(Student, request.student_id)
+    if not student:
+        return jsonify({"error": "Student not found"}), 404
+
+    active_count = Enrollment.query.filter_by(
+        student_id=student.student_id, status="active"
+    ).count()
+
+    return jsonify({
+        "student_id": student.student_id,
+        "name": student.name,
+        "email": student.email,
+        "program": student.program,
+        "degree_status": student.degree_status,
+        "status": student.status,
+        "max_courses": student.max_courses,
+        "enrolled_count": active_count,
+        "fee_per_credit": student.fee_per_credit,
     })
 
 

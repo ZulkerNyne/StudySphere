@@ -94,6 +94,37 @@ export async function chatWithAdvisor(message, history = []) {
   return { ok: res.ok, data: await res.json() }
 }
 
+export async function getProfile() {
+  const res = await fetch(`${API_BASE}/auth/profile`, {
+    headers: authHeaders(),
+  })
+  return { ok: res.ok, data: await res.json() }
+}
+
+export async function getFees() {
+  const res = await fetch(`${API_BASE}/enrollment/fees`, {
+    headers: authHeaders(),
+  })
+  return { ok: res.ok, data: await res.json() }
+}
+
+export async function swapCourse(dropCourseNum, enrollCourseNum) {
+  const res = await fetch(`${API_BASE}/enrollment/swap`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: JSON.stringify({ drop_course: dropCourseNum, enroll_course: enrollCourseNum }),
+  })
+  return { ok: res.ok, data: await res.json() }
+}
+
+export async function getDropHistory() {
+  const studentId = localStorage.getItem('studentId')
+  const res = await fetch(`${API_BASE}/enrollment/history/${studentId}`, {
+    headers: authHeaders(),
+  })
+  return { ok: res.ok, data: await res.json() }
+}
+
 export function logout() {
   localStorage.removeItem('token')
   localStorage.removeItem('studentId')

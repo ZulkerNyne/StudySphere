@@ -85,6 +85,20 @@ export default function Register() {
               </div>
             </div>
 
+            <div className="form-row">
+              <div className="form-group">
+                <label>Enrollment Status</label>
+                <select value={form.status} onChange={e => update('status', e.target.value)}>
+                  <option>Full-time</option>
+                  <option>Part-time</option>
+                </select>
+              </div>
+              <div className="form-group form-hint">
+                <p>Full-time: up to 5 courses ($350/cr undergrad, $500/cr grad)</p>
+                <p>Part-time: up to 3 courses ($450/cr undergrad, $600/cr grad)</p>
+              </div>
+            </div>
+
             <button type="submit" className="btn btn-primary btn-full" disabled={loading}>
               {loading ? 'Creating account...' : 'Create Account'}
             </button>

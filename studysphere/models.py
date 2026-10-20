@@ -2,6 +2,14 @@ from datetime import datetime, timezone
 from studysphere.app import db
 
 
+FEE_PER_CREDIT = {
+    "Full-time": {"Undergraduate": 350, "Graduate": 500},
+    "Part-time": {"Undergraduate": 450, "Graduate": 600},
+}
+
+MAX_COURSES = {"Full-time": 5, "Part-time": 3}
+
+
 class Student(db.Model):
     __tablename__ = "students"
 
@@ -10,10 +18,18 @@ class Student(db.Model):
     email = db.Column(db.String, nullable=False, unique=True)
     program = db.Column(db.String, nullable=False)
     degree_status = db.Column(db.String, nullable=False)
-    status = db.Column(db.String, nullable=False)
+    status = db.Column(db.String, nullable=False, default="Full-time")
     password_hash = db.Column(db.String, nullable=False)
 
     enrollments = db.relationship("Enrollment", back_populates="student")
+
+    @property
+    def max_courses(self):
+        return MAX_COURSES.get(self.status, 5)
+
+    @property
+    def fee_per_credit(self):
+        return FEE_PER_CREDIT.get(self.status, {}).get(self.degree_status, 400)
 
 
 class Course(db.Model):

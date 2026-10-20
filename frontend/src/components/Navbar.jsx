@@ -27,7 +27,10 @@ export default function Navbar() {
 
         <div className="navbar-actions">
           {loggedIn ? (
-            <button className="btn btn-outline" onClick={handleLogout}>Sign Out</button>
+            <>
+              <Link to="/profile" className="btn btn-outline">My Profile</Link>
+              <button className="btn btn-outline" onClick={handleLogout}>Sign Out</button>
+            </>
           ) : (
             <>
               <Link to="/login" className="btn btn-outline">Sign In</Link>
