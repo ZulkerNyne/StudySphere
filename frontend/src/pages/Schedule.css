@@ -9,10 +9,16 @@
   padding-bottom: 60px;
 }
 
+.schedule-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
 .schedule-container h1 {
   font-family: 'Playfair Display', serif;
   font-size: 1.8rem;
-  margin-bottom: 24px;
 }
 
 .schedule-empty {

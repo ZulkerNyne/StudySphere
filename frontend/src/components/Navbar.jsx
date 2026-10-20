@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { isLoggedIn, logout } from '../api'
+import { isLoggedIn, isAdmin, logout } from '../api'
 import './Navbar.css'
 
 export default function Navbar() {
@@ -29,6 +29,7 @@ export default function Navbar() {
           {loggedIn ? (
             <>
               <Link to="/profile" className="btn btn-outline">My Profile</Link>
+              {isAdmin() && <Link to="/admin" className="btn btn-outline">Admin</Link>}
               <button className="btn btn-outline" onClick={handleLogout}>Sign Out</button>
             </>
           ) : (

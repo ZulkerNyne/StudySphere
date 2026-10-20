@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getSchedule, isLoggedIn } from '../api'
+import { getSchedule, exportSchedule, isLoggedIn } from '../api'
 import Navbar from '../components/Navbar'
 import './Schedule.css'
 
@@ -56,7 +56,14 @@ export default function Schedule() {
     <div className="schedule-page">
       <Navbar />
       <div className="container schedule-container">
-        <h1>Weekly Schedule</h1>
+        <div className="schedule-title-row">
+          <h1>Weekly Schedule</h1>
+          {allCourses.length > 0 && (
+            <button className="btn btn-outline" onClick={exportSchedule}>
+              Export to Calendar (.ics)
+            </button>
+          )}
+        </div>
 
         {loading ? (
           <p>Loading schedule...</p>

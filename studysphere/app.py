@@ -23,6 +23,8 @@ def create_app(config_class=None):
     from studysphere.routes.enrollment import enrollment_bp
     from studysphere.routes.schedule import schedule_bp
     from studysphere.routes.advisor import advisor_bp
+    from studysphere.routes.reviews import reviews_bp
+    from studysphere.routes.admin import admin_bp
 
     app.register_blueprint(health_bp)
     app.register_blueprint(auth_bp)
@@ -30,6 +32,8 @@ def create_app(config_class=None):
     app.register_blueprint(enrollment_bp)
     app.register_blueprint(schedule_bp)
     app.register_blueprint(advisor_bp)
+    app.register_blueprint(reviews_bp)
+    app.register_blueprint(admin_bp)
 
     with app.app_context():
         db.create_all()

@@ -20,8 +20,10 @@ class Student(db.Model):
     degree_status = db.Column(db.String, nullable=False)
     status = db.Column(db.String, nullable=False, default="Full-time")
     password_hash = db.Column(db.String, nullable=False)
+    is_admin = db.Column(db.Boolean, nullable=False, default=False)
 
     enrollments = db.relationship("Enrollment", back_populates="student")
+    reviews = db.relationship("Review", back_populates="student")
 
     @property
     def max_courses(self):
@@ -50,6 +52,14 @@ class Course(db.Model):
     embedding_id = db.Column(db.String, nullable=True)
 
     enrollments = db.relationship("Enrollment", back_populates="course")
+    reviews = db.relationship("Review", back_populates="course")
+    waitlist_entries = db.relationship("Waitlist", back_populates="course", order_by="Waitlist.position")
+
+    prerequisites = db.relationship(
+        "Prerequisite",
+        foreign_keys="Prerequisite.course_number",
+        back_populates="course",
+    )
 
 
 class Enrollment(db.Model):
@@ -67,4 +77,54 @@ class Enrollment(db.Model):
 
     __table_args__ = (
         db.UniqueConstraint("student_id", "course_number", name="uq_active_enrollment"),
+    )
+
+
+class Prerequisite(db.Model):
+    __tablename__ = "prerequisites"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    course_number = db.Column(db.String, db.ForeignKey("courses.course_number"), nullable=False)
+    prerequisite_number = db.Column(db.String, db.ForeignKey("courses.course_number"), nullable=False)
+
+    course = db.relationship("Course", foreign_keys=[course_number], back_populates="prerequisites")
+    prerequisite = db.relationship("Course", foreign_keys=[prerequisite_number])
+
+    __table_args__ = (
+        db.UniqueConstraint("course_number", "prerequisite_number", name="uq_prereq"),
+    )
+
+
+class Waitlist(db.Model):
+    __tablename__ = "waitlist"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    student_id = db.Column(db.String, db.ForeignKey("students.student_id"), nullable=False)
+    course_number = db.Column(db.String, db.ForeignKey("courses.course_number"), nullable=False)
+    position = db.Column(db.Integer, nullable=False)
+    joined_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+
+    student = db.relationship("Student")
+    course = db.relationship("Course", back_populates="waitlist_entries")
+
+    __table_args__ = (
+        db.UniqueConstraint("student_id", "course_number", name="uq_waitlist_entry"),
+    )
+
+
+class Review(db.Model):
+    __tablename__ = "reviews"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    student_id = db.Column(db.String, db.ForeignKey("students.student_id"), nullable=False)
+    course_number = db.Column(db.String, db.ForeignKey("courses.course_number"), nullable=False)
+    rating = db.Column(db.Integer, nullable=False)
+    comment = db.Column(db.Text, default="")
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+
+    student = db.relationship("Student", back_populates="reviews")
+    course = db.relationship("Course", back_populates="reviews")
+
+    __table_args__ = (
+        db.UniqueConstraint("student_id", "course_number", name="uq_review"),
     )

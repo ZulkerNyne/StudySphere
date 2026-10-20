@@ -2,8 +2,9 @@
 import random
 
 from studysphere.app import create_app, db
-from studysphere.models import Course
+from studysphere.models import Course, Prerequisite, Student
 from studysphere.services.embedding_service import ingest_courses
+from studysphere.services.auth_service import hash_password
 
 FIRST_NAMES = [
     "James", "Sarah", "Michael", "Emily", "David", "Jessica", "Robert", "Jennifer",
@@ -412,12 +413,95 @@ def build_courses():
     return courses
 
 
+PREREQUISITES = [
+    # CPSC chain
+    ("CPSC 219", "CPSC 217"),
+    ("CPSC 233", "CPSC 231"),
+    ("CPSC 319", "CPSC 233"),
+    ("CPSC 331", "CPSC 233"),
+    ("CPSC 331", "CPSC 251"),
+    ("CPSC 313", "CPSC 251"),
+    ("CPSC 355", "CPSC 233"),
+    ("CPSC 359", "CPSC 355"),
+    ("CPSC 413", "CPSC 331"),
+    ("CPSC 418", "CPSC 331"),
+    ("CPSC 433", "CPSC 331"),
+    ("CPSC 441", "CPSC 331"),
+    ("CPSC 449", "CPSC 331"),
+    ("CPSC 457", "CPSC 331"),
+    ("CPSC 457", "CPSC 355"),
+    ("CPSC 471", "CPSC 331"),
+    ("CPSC 481", "CPSC 331"),
+    ("CPSC 329", "CPSC 217"),
+    # CPSC grad
+    ("CPSC 517", "CPSC 413"),
+    ("CPSC 526", "CPSC 441"),
+    ("CPSC 544", "CPSC 433"),
+    ("CPSC 571", "CPSC 471"),
+    # ENSF chain
+    ("ENSF 380", "ENSF 310"),
+    ("ENSF 409", "ENSF 380"),
+    ("ENSF 480", "ENSF 409"),
+    # MATH chain
+    ("MATH 253", "MATH 249"),
+    ("MATH 267", "MATH 265"),
+    ("MATH 311", "MATH 211"),
+    ("MATH 315", "MATH 267"),
+    ("MATH 375", "MATH 315"),
+    ("MATH 381", "MATH 267"),
+    ("MATH 413", "MATH 311"),
+    ("MATH 415", "MATH 271"),
+    # STAT chain
+    ("STAT 321", "STAT 213"),
+    ("STAT 323", "STAT 213"),
+    ("STAT 421", "STAT 321"),
+    # PHYS chain
+    ("PHYS 221", "PHYS 211"),
+    ("PHYS 301", "PHYS 221"),
+    ("PHYS 321", "PHYS 211"),
+    ("PHYS 323", "PHYS 259"),
+    ("PHYS 343", "PHYS 221"),
+    ("PHYS 443", "PHYS 301"),
+    # CHEM chain
+    ("CHEM 203", "CHEM 201"),
+    ("CHEM 351", "CHEM 201"),
+    ("CHEM 353", "CHEM 351"),
+    ("CHEM 401", "CHEM 203"),
+    ("CHEM 403", "CHEM 401"),
+    ("CHEM 431", "CHEM 203"),
+    # BIOL chain
+    ("BIOL 207", "BIOL 205"),
+    ("BIOL 213", "BIOL 211"),
+    ("BIOL 311", "BIOL 211"),
+    ("BIOL 313", "BIOL 211"),
+    ("BIOL 331", "BIOL 207"),
+    ("BIOL 371", "CHEM 201"),
+    ("BIOL 373", "BIOL 371"),
+    # ECON chain
+    ("ECON 301", "ECON 201"),
+    ("ECON 303", "ECON 203"),
+    ("ECON 395", "ECON 201"),
+    ("ECON 413", "ECON 301"),
+    ("ECON 421", "ECON 203"),
+    # Other
+    ("PHIL 367", "PHIL 267"),
+    ("SOCI 301", "SOCI 201"),
+    ("SOCI 311", "SOCI 201"),
+    ("POLI 381", "POLI 201"),
+    ("LING 301", "LING 201"),
+    ("GLGY 301", "GLGY 209"),
+    ("ENGG 202", "ENGG 201"),
+    ("ENGG 349", "ENGG 202"),
+]
+
+
 def seed():
     app = create_app()
     with app.app_context():
         existing = Course.query.count()
         if existing > 0:
-            print(f"Clearing {existing} existing courses...")
+            print(f"Clearing existing data...")
+            db.session.query(Prerequisite).delete()
             db.session.query(Course).delete()
             db.session.commit()
 
@@ -426,6 +510,31 @@ def seed():
             db.session.add(c)
         db.session.commit()
         print(f"Seeded {len(courses)} real UCalgary courses into database.")
+
+        for course_num, prereq_num in PREREQUISITES:
+            prereq = Prerequisite(
+                course_number=course_num,
+                prerequisite_number=prereq_num,
+            )
+            db.session.add(prereq)
+        db.session.commit()
+        print(f"Added {len(PREREQUISITES)} prerequisite relationships.")
+
+        admin = Student.query.filter_by(student_id="ADMIN").first()
+        if not admin:
+            admin = Student(
+                student_id="ADMIN",
+                name="System Admin",
+                email="admin@ucalgary.ca",
+                program="Computer Science",
+                degree_status="Graduate",
+                status="Full-time",
+                password_hash=hash_password("admin123"),
+                is_admin=True,
+            )
+            db.session.add(admin)
+            db.session.commit()
+            print("Created admin account (ID: ADMIN, password: admin123)")
 
         count = ingest_courses()
         print(f"Ingested {count} courses into ChromaDB.")

@@ -5,8 +5,11 @@ from studysphere.services.enrollment_service import (
     drop_course,
     swap_course,
     calculate_fees,
+    join_waitlist,
+    leave_waitlist,
+    get_waitlist_status,
 )
-from studysphere.models import Enrollment, Student
+from studysphere.models import Enrollment, Waitlist
 from studysphere.app import db
 
 enrollment_bp = Blueprint("enrollment", __name__, url_prefix="/api/enrollment")
@@ -63,6 +66,41 @@ def fees():
     if not result:
         return jsonify({"error": "Student not found"}), 404
     return jsonify(result)
+
+
+@enrollment_bp.route("/waitlist/join", methods=["POST"])
+@login_required
+def waitlist_join():
+    data = request.get_json()
+    if not data or "course_number" not in data:
+        return jsonify({"error": "course_number required"}), 400
+
+    success, message = join_waitlist(request.student_id, data["course_number"])
+    if not success:
+        return jsonify({"error": message}), 409
+    return jsonify({"message": message}), 201
+
+
+@enrollment_bp.route("/waitlist/leave", methods=["POST"])
+@login_required
+def waitlist_leave():
+    data = request.get_json()
+    if not data or "course_number" not in data:
+        return jsonify({"error": "course_number required"}), 400
+
+    success, message = leave_waitlist(request.student_id, data["course_number"])
+    if not success:
+        return jsonify({"error": message}), 404
+    return jsonify({"message": message})
+
+
+@enrollment_bp.route("/waitlist/status/<course_number>", methods=["GET"])
+@login_required
+def waitlist_status(course_number):
+    status = get_waitlist_status(request.student_id, course_number)
+    if not status:
+        return jsonify({"on_waitlist": False})
+    return jsonify({"on_waitlist": True, **status})
 
 
 @enrollment_bp.route("/<student_id>", methods=["GET"])

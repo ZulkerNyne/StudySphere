@@ -1,9 +1,36 @@
 from flask import Blueprint, request, jsonify
 from studysphere.app import db
-from studysphere.models import Course
+from studysphere.models import Course, Prerequisite, Review, Waitlist
 from studysphere.services.auth_service import login_required
 
 courses_bp = Blueprint("courses", __name__, url_prefix="/api/courses")
+
+
+def course_to_dict(c):
+    reviews = Review.query.filter_by(course_number=c.course_number).all()
+    avg_rating = round(sum(r.rating for r in reviews) / len(reviews), 1) if reviews else None
+    waitlist_count = Waitlist.query.filter_by(course_number=c.course_number).count()
+
+    prereqs = Prerequisite.query.filter_by(course_number=c.course_number).all()
+    prereq_list = [p.prerequisite_number for p in prereqs]
+
+    return {
+        "course_number": c.course_number,
+        "course_name": c.course_name,
+        "professor_name": c.professor_name,
+        "start_time": c.start_time,
+        "end_time": c.end_time,
+        "level": c.level,
+        "credits": c.credits,
+        "total_seats": c.total_seats,
+        "available_seats": c.available_seats,
+        "semester": c.semester,
+        "days": c.days,
+        "avg_rating": avg_rating,
+        "review_count": len(reviews),
+        "waitlist_count": waitlist_count,
+        "prerequisites": prereq_list,
+    }
 
 
 @courses_bp.route("", methods=["GET"])
@@ -37,22 +64,7 @@ def search_courses():
             filters.append(Course.level == level)
         courses = Course.query.filter(*filters).limit(50).all()
 
-    return jsonify([
-        {
-            "course_number": c.course_number,
-            "course_name": c.course_name,
-            "professor_name": c.professor_name,
-            "start_time": c.start_time,
-            "end_time": c.end_time,
-            "level": c.level,
-            "credits": c.credits,
-            "total_seats": c.total_seats,
-            "available_seats": c.available_seats,
-            "semester": c.semester,
-            "days": c.days,
-        }
-        for c in courses
-    ])
+    return jsonify([course_to_dict(c) for c in courses])
 
 
 @courses_bp.route("/<course_number>", methods=["GET"])
@@ -62,20 +74,9 @@ def get_course(course_number):
     if not course:
         return jsonify({"error": "Course not found"}), 404
 
-    return jsonify({
-        "course_number": course.course_number,
-        "course_name": course.course_name,
-        "professor_name": course.professor_name,
-        "start_time": course.start_time,
-        "end_time": course.end_time,
-        "level": course.level,
-        "credits": course.credits,
-        "total_seats": course.total_seats,
-        "available_seats": course.available_seats,
-        "semester": course.semester,
-        "days": course.days,
-        "description": course.description,
-    })
+    data = course_to_dict(course)
+    data["description"] = course.description
+    return jsonify(data)
 
 
 @courses_bp.route("/ingest", methods=["POST"])

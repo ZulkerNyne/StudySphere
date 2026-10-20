@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard'
 import Schedule from './pages/Schedule'
 import Advisor from './pages/Advisor'
 import Profile from './pages/Profile'
+import Admin from './pages/Admin'
 import './App.css'
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
         <Route path="/schedule" element={<Schedule />} />
         <Route path="/advisor" element={<Advisor />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/admin" element={<Admin />} />
       </Routes>
     </BrowserRouter>
   )

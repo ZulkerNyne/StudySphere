@@ -19,6 +19,8 @@ export async function login(studentId, password) {
   if (res.ok) {
     localStorage.setItem('token', data.access_token)
     localStorage.setItem('studentId', data.student_id)
+    if (data.is_admin) localStorage.setItem('isAdmin', '1')
+    else localStorage.removeItem('isAdmin')
   }
   return { ok: res.ok, data }
 }
@@ -85,6 +87,22 @@ export async function getSchedule() {
   return { ok: res.ok, data: await res.json() }
 }
 
+export async function exportSchedule() {
+  const studentId = localStorage.getItem('studentId')
+  const res = await fetch(`${API_BASE}/schedule/${studentId}/export`, {
+    headers: authHeaders(),
+  })
+  if (!res.ok) return { ok: false }
+  const blob = await res.blob()
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = 'schedule.ics'
+  a.click()
+  URL.revokeObjectURL(url)
+  return { ok: true }
+}
+
 export async function chatWithAdvisor(message, history = []) {
   const res = await fetch(`${API_BASE}/advisor/chat`, {
     method: 'POST',
@@ -125,9 +143,104 @@ export async function getDropHistory() {
   return { ok: res.ok, data: await res.json() }
 }
 
+// Waitlist
+export async function joinWaitlist(courseNumber) {
+  const res = await fetch(`${API_BASE}/enrollment/waitlist/join`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: JSON.stringify({ course_number: courseNumber }),
+  })
+  return { ok: res.ok, data: await res.json() }
+}
+
+export async function leaveWaitlist(courseNumber) {
+  const res = await fetch(`${API_BASE}/enrollment/waitlist/leave`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: JSON.stringify({ course_number: courseNumber }),
+  })
+  return { ok: res.ok, data: await res.json() }
+}
+
+export async function getWaitlistStatus(courseNumber) {
+  const res = await fetch(`${API_BASE}/enrollment/waitlist/status/${courseNumber}`, {
+    headers: authHeaders(),
+  })
+  return { ok: res.ok, data: await res.json() }
+}
+
+// Reviews
+export async function getReviews(courseNumber) {
+  const res = await fetch(`${API_BASE}/reviews/${courseNumber}`, {
+    headers: authHeaders(),
+  })
+  return { ok: res.ok, data: await res.json() }
+}
+
+export async function addReview(courseNumber, rating, comment) {
+  const res = await fetch(`${API_BASE}/reviews/${courseNumber}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: JSON.stringify({ rating, comment }),
+  })
+  return { ok: res.ok, data: await res.json() }
+}
+
+export async function deleteReview(courseNumber) {
+  const res = await fetch(`${API_BASE}/reviews/${courseNumber}`, {
+    method: 'DELETE',
+    headers: authHeaders(),
+  })
+  return { ok: res.ok, data: await res.json() }
+}
+
+// Admin
+export async function getAdminDashboard() {
+  const res = await fetch(`${API_BASE}/admin/dashboard`, {
+    headers: authHeaders(),
+  })
+  return { ok: res.ok, data: await res.json() }
+}
+
+export async function getAdminStudents() {
+  const res = await fetch(`${API_BASE}/admin/students`, {
+    headers: authHeaders(),
+  })
+  return { ok: res.ok, data: await res.json() }
+}
+
+export async function getAdminCourses() {
+  const res = await fetch(`${API_BASE}/admin/courses`, {
+    headers: authHeaders(),
+  })
+  return { ok: res.ok, data: await res.json() }
+}
+
+export async function toggleAdmin(studentId) {
+  const res = await fetch(`${API_BASE}/admin/students/${studentId}/toggle-admin`, {
+    method: 'POST',
+    headers: authHeaders(),
+  })
+  return { ok: res.ok, data: await res.json() }
+}
+
+export async function updateCourse(courseNumber, updates) {
+  const res = await fetch(`${API_BASE}/admin/courses/${courseNumber}/update`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: JSON.stringify(updates),
+  })
+  return { ok: res.ok, data: await res.json() }
+}
+
 export function logout() {
   localStorage.removeItem('token')
   localStorage.removeItem('studentId')
+  localStorage.removeItem('isAdmin')
+}
+
+export function isAdmin() {
+  return localStorage.getItem('isAdmin') === '1'
 }
 
 export function isLoggedIn() {

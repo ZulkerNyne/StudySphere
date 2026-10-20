@@ -57,6 +57,7 @@ def login():
         "access_token": create_token(student.student_id),
         "refresh_token": create_refresh_token(student.student_id),
         "student_id": student.student_id,
+        "is_admin": student.is_admin,
     })
 
 
@@ -81,6 +82,7 @@ def profile():
         "max_courses": student.max_courses,
         "enrolled_count": active_count,
         "fee_per_credit": student.fee_per_credit,
+        "is_admin": student.is_admin,
     })
 
 
