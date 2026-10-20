@@ -1,0 +1,337 @@
+.home {
+  padding-top: 72px;
+}
+
+/* Hero */
+.hero {
+  padding: 80px 0 60px;
+  background: var(--bg);
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+
+.hero-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: var(--primary);
+  margin-bottom: 20px;
+}
+
+.hero-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 3.5rem;
+  line-height: 1.1;
+  font-weight: 600;
+  margin-bottom: 24px;
+  color: var(--text);
+}
+
+.hero-title em {
+  font-style: italic;
+  color: var(--primary);
+}
+
+.hero-subtitle {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  margin-bottom: 36px;
+  max-width: 480px;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 16px;
+}
+
+.btn-lg {
+  padding: 14px 32px;
+  font-size: 1rem;
+}
+
+/* Hero Cards — tall pill-shaped like banking screenshot */
+.hero-cards {
+  display: flex;
+  gap: 12px;
+  height: 520px;
+}
+
+.feature-card {
+  border-radius: 28px;
+  overflow: hidden;
+  position: relative;
+  transition: transform 0.3s;
+}
+
+.feature-card:hover {
+  transform: translateY(-4px);
+}
+
+.card-inner {
+  padding: 28px 24px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 2;
+}
+
+.card-inner h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem;
+  margin-bottom: 8px;
+}
+
+.card-desc {
+  font-size: 0.82rem;
+  line-height: 1.5;
+  opacity: 0.8;
+}
+
+/* Course Search — wide card with light bg and visual element */
+.card-courses {
+  flex: 1.6;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+}
+
+.card-courses .card-inner h3 { color: var(--text); }
+.card-courses .card-desc { color: var(--text-secondary); }
+
+.card-visual {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 16px -8px 8px;
+}
+
+.card-visual-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+  background:
+    linear-gradient(145deg, rgba(45,106,79,0.08) 0%, rgba(212,163,115,0.12) 50%, rgba(45,106,79,0.06) 100%),
+    radial-gradient(ellipse at 30% 60%, rgba(45,106,79,0.15) 0%, transparent 60%),
+    radial-gradient(ellipse at 70% 40%, rgba(212,163,115,0.2) 0%, transparent 50%);
+  background-color: #f0ede8;
+}
+
+/* AI Advisor — dark green with wavy texture */
+.card-advisor {
+  flex: 0.8;
+  background: var(--primary-dark);
+  color: var(--text-light);
+}
+
+/* Schedule — gold with wavy texture */
+.card-schedule {
+  flex: 0.8;
+  background: var(--accent);
+  color: var(--text);
+}
+
+/* Wavy texture overlay for dark cards */
+.card-texture {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: 28px;
+  overflow: hidden;
+}
+
+.card-advisor .card-texture {
+  background:
+    radial-gradient(ellipse at 20% 80%, #1a4731 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, #3d8b6e 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, #245a3f 0%, transparent 60%),
+    linear-gradient(160deg, #1b4332 0%, #2d6a4f 40%, #1b4332 70%, #2d6a4f 100%);
+}
+
+.card-schedule .card-texture {
+  background:
+    radial-gradient(ellipse at 20% 80%, #c4944e 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, #e0be8a 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, #d4a373 0%, transparent 60%),
+    linear-gradient(160deg, #c49560 0%, #d4a373 40%, #c49560 70%, #e0be8a 100%);
+}
+
+/* Vertical label for narrow cards */
+.card-label {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  font-style: italic;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  letter-spacing: 1px;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.card-icons {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  box-shadow: var(--shadow);
+}
+
+.card-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  color: inherit;
+  font-size: 1.2rem;
+  margin-top: auto;
+  align-self: flex-start;
+  transition: background 0.2s;
+  text-decoration: none;
+}
+
+.card-arrow:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.card-courses .card-arrow {
+  background: var(--primary);
+  color: white;
+}
+
+/* Features Grid */
+.features {
+  padding: 80px 0;
+  background: var(--bg-soft);
+}
+
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.2rem;
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+
+.feature-item {
+  background: var(--bg);
+  padding: 32px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  transition: box-shadow 0.3s;
+}
+
+.feature-item:hover {
+  box-shadow: var(--shadow);
+}
+
+.feature-icon {
+  font-size: 2rem;
+  margin-bottom: 16px;
+}
+
+.feature-item h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.feature-item p {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* CTA */
+.cta {
+  padding: 80px 0;
+}
+
+.cta-inner {
+  text-align: center;
+}
+
+.cta h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.2rem;
+  margin-bottom: 16px;
+}
+
+.cta p {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  margin-bottom: 32px;
+}
+
+/* Footer */
+.footer {
+  padding: 32px 0;
+  border-top: 1px solid var(--border);
+}
+
+.footer-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+
+.footer p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+  .hero-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-title {
+    font-size: 2.4rem;
+  }
+
+  .hero-cards {
+    height: 320px;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-inner {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+  }
+}
