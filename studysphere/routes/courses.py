@@ -12,21 +12,30 @@ def search_courses():
     query = request.args.get("q", "")
     semester = request.args.get("semester")
     level = request.args.get("level")
+    mode = request.args.get("mode", "keyword")
 
-    filters = []
-    if query:
-        pattern = f"%{query}%"
-        filters.append(
-            (Course.course_number.ilike(pattern))
-            | (Course.course_name.ilike(pattern))
-            | (Course.professor_name.ilike(pattern))
-        )
-    if semester:
-        filters.append(Course.semester == semester)
-    if level:
-        filters.append(Course.level == level)
+    courses = []
+    if mode == "semantic" and query:
+        try:
+            from studysphere.services.embedding_service import semantic_search
+            courses = semantic_search(query, n_results=50, semester=semester, level=level)
+        except Exception:
+            pass
 
-    courses = Course.query.filter(*filters).limit(50).all()
+    if not courses:
+        filters = []
+        if query:
+            pattern = f"%{query}%"
+            filters.append(
+                (Course.course_number.ilike(pattern))
+                | (Course.course_name.ilike(pattern))
+                | (Course.professor_name.ilike(pattern))
+            )
+        if semester:
+            filters.append(Course.semester == semester)
+        if level:
+            filters.append(Course.level == level)
+        courses = Course.query.filter(*filters).limit(50).all()
 
     return jsonify([
         {
@@ -67,3 +76,11 @@ def get_course(course_number):
         "days": course.days,
         "description": course.description,
     })
+
+
+@courses_bp.route("/ingest", methods=["POST"])
+@login_required
+def ingest():
+    from studysphere.services.embedding_service import ingest_courses
+    count = ingest_courses()
+    return jsonify({"message": f"Ingested {count} courses into ChromaDB"})

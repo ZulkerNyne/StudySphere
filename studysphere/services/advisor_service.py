@@ -138,20 +138,28 @@ def _search_courses(params):
     semester = params.get("semester")
     level = params.get("level")
 
-    filters = []
-    if query:
-        pattern = f"%{query}%"
-        filters.append(
-            (Course.course_number.ilike(pattern))
-            | (Course.course_name.ilike(pattern))
-            | (Course.professor_name.ilike(pattern))
-        )
-    if semester:
-        filters.append(Course.semester == semester)
-    if level:
-        filters.append(Course.level == level)
+    # Try semantic search first, fall back to keyword search
+    courses = []
+    try:
+        from studysphere.services.embedding_service import semantic_search
+        courses = semantic_search(query, n_results=10, semester=semester, level=level)
+    except Exception:
+        pass
 
-    courses = Course.query.filter(*filters).limit(10).all()
+    if not courses:
+        filters = []
+        if query:
+            pattern = f"%{query}%"
+            filters.append(
+                (Course.course_number.ilike(pattern))
+                | (Course.course_name.ilike(pattern))
+                | (Course.professor_name.ilike(pattern))
+            )
+        if semester:
+            filters.append(Course.semester == semester)
+        if level:
+            filters.append(Course.level == level)
+        courses = Course.query.filter(*filters).limit(10).all()
     return [
         {
             "course_number": c.course_number,
