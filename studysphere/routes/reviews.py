@@ -21,10 +21,16 @@ def get_reviews(course_number):
     if reviews:
         avg_rating = round(sum(r.rating for r in reviews) / len(reviews), 1)
 
+    can_review = Enrollment.query.filter_by(
+        student_id=request.student_id,
+        course_number=course_number,
+    ).first() is not None
+
     return jsonify({
         "course_number": course_number,
         "average_rating": avg_rating,
         "count": len(reviews),
+        "can_review": can_review,
         "reviews": [
             {
                 "id": r.id,

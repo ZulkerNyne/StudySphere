@@ -236,27 +236,31 @@ export default function Dashboard() {
               ))}
             </div>
 
-            <form className="review-form" onSubmit={handleSubmitReview}>
-              <h3>Write a Review</h3>
-              <div className="star-picker">
-                {[1, 2, 3, 4, 5].map(n => (
-                  <span
-                    key={n}
-                    className={`star ${n <= reviewData.rating ? 'active' : ''}`}
-                    onClick={() => setReviewData(d => ({ ...d, rating: n }))}
-                  >
-                    ★
-                  </span>
-                ))}
-              </div>
-              <textarea
-                value={reviewData.comment}
-                onChange={e => setReviewData(d => ({ ...d, comment: e.target.value }))}
-                placeholder="Share your experience..."
-                rows={3}
-              />
-              <button type="submit" className="btn btn-primary btn-sm">Submit Review</button>
-            </form>
+            {courseReviews.can_review ? (
+              <form className="review-form" onSubmit={handleSubmitReview}>
+                <h3>Write a Review</h3>
+                <div className="star-picker">
+                  {[1, 2, 3, 4, 5].map(n => (
+                    <span
+                      key={n}
+                      className={`star ${n <= reviewData.rating ? 'active' : ''}`}
+                      onClick={() => setReviewData(d => ({ ...d, rating: n }))}
+                    >
+                      ★
+                    </span>
+                  ))}
+                </div>
+                <textarea
+                  value={reviewData.comment}
+                  onChange={e => setReviewData(d => ({ ...d, comment: e.target.value }))}
+                  placeholder="Share your experience..."
+                  rows={3}
+                />
+                <button type="submit" className="btn btn-primary btn-sm">Submit Review</button>
+              </form>
+            ) : (
+              <p className="review-notice">Enroll in this course to leave a review.</p>
+            )}
           </div>
         </div>
       )}
